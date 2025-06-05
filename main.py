@@ -1,3 +1,4 @@
+import json
 from pynput import keyboard
 from transformers import AutoTokenizer, AutoModelForMaskedLM
 from collections import defaultdict
@@ -18,6 +19,19 @@ def buildIndex(words):
         for i, char in enumerate(word):
             index[i][char].append(word)
     return index
+
+def loadIndex(filename="index.json"):
+    with open(filename, "r", encoding="utf-8") as f:
+        index = json.load(f)
+    return index
+
+def convert_defaultdict(obj):
+    if isinstance(obj, defaultdict):
+        return {k: convert_defaultdict(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return obj
+    else:
+        return obj
 
 def searchWord(index, pattern):
     sets = []
@@ -80,16 +94,22 @@ def on_press(key):
 
 
 if __name__ == '__main__':
-    words = ['cara','teja','tela','salsa','arbol','becerro','casa','dado','enzima','flaca','gato','hijo','isla']
     phrase = ""
     phrases = []
     is_incomplete = False
     is_chossing = False
 
-    index = buildIndex(words)
+    index = loadIndex("index.json")
+    print("readeded")
+    
+    for position in index:
+        print(f"Posición {position}:")
+        for letter in index[position]:
+            print(f"  Letra '{letter}': {index[position][letter]}")
+
     listener = keyboard.Listener(on_press=on_press)
     listener.start()
     listener.join()
 
     print(phrase)
-#lacasadete a1es
+#lacasaesdete a1
